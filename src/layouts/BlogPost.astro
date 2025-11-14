@@ -5,9 +5,12 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<'blog'>['data'] & {
+	prevPost?: { id: string; title: string } | null;
+	nextPost?: { id: string; title: string } | null;
+};
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, prevPost, nextPost } = Astro.props;
 ---
 
 <html lang="en">
@@ -51,6 +54,49 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			.last-updated-on {
 				font-style: italic;
 			}
+			.post-navigation {
+				width: 720px;
+				max-width: calc(100% - 2em);
+				margin: 2em auto;
+				padding: 1em;
+				display: flex;
+				justify-content: space-between;
+				gap: 1em;
+				border-top: 1px solid rgb(var(--gray-light));
+			}
+			.nav-link {
+				flex: 1;
+				text-decoration: none;
+				padding: 1em;
+				border-radius: 8px;
+				background-color: rgb(var(--gray-light));
+				transition: background-color 0.2s ease;
+			}
+			.nav-link:hover {
+				background-color: rgb(var(--gray));
+			}
+			.nav-link.prev {
+				text-align: left;
+			}
+			.nav-link.next {
+				text-align: right;
+			}
+			.nav-link .label {
+				font-size: 0.875rem;
+				color: rgb(var(--gray));
+				margin-bottom: 0.25em;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+			}
+			.nav-link .title {
+				font-weight: 600;
+				color: rgb(var(--gray-dark));
+				padding: 0;
+				margin: 0;
+			}
+			.nav-placeholder {
+				flex: 1;
+			}
 		</style>
 	</head>
 
@@ -79,6 +125,26 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 					<slot />
 				</div>
 			</article>
+			{(prevPost || nextPost) && (
+				<nav class="post-navigation">
+					{prevPost ? (
+						<a href={`/blog/${prevPost.id}/`} class="nav-link prev">
+							<div class="label">← Previous</div>
+							<div class="title">{prevPost.title}</div>
+						</a>
+					) : (
+						<div class="nav-placeholder"></div>
+					)}
+					{nextPost ? (
+						<a href={`/blog/${nextPost.id}/`} class="nav-link next">
+							<div class="label">Next →</div>
+							<div class="title">{nextPost.title}</div>
+						</a>
+					) : (
+						<div class="nav-placeholder"></div>
+					)}
+				</nav>
+			)}
 		</main>
 		<Footer />
 	</body>
